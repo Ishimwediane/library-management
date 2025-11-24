@@ -1,4 +1,3 @@
-# utils.py
 def search_books(books, query, field):
     query = query.lower()
     results = []
