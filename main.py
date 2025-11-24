@@ -1,87 +1,91 @@
-from library.author import Author
 from library.resources import Book
+from library.author import Author
 from library.borrow import Borrow
 from library import file_io
+from datetime import date
 
+def get_available_copies(book, borrows):
+    borrowed_count = sum(1 for b in borrows if b.book_title == book.title and b.return_date is None)
+    return book.copies - borrowed_count
 
 def main():
-    # Load existing data
     books = file_io.load_books()
     borrows = file_io.load_borrows()
-
-    print("Welcome to the Library Inventory System!\n")
-
+    
     while True:
-        print("Menu:")
+        print("\nMenu:")
         print("1. Add a book")
         print("2. List all books")
         print("3. Borrow a book")
-        print("4. List borrow records")
-        print("5. Exit")
+        print("4. Return a book")
+        print("5. List borrow records")
+        print("6. Exit")
         choice = input("Enter your choice: ")
 
         if choice == "1":
-            # Add a new book
-            title = input("Book title: ")
+            title = input("Title: ")
             author_name = input("Author name: ")
-            nationality = input("Author nationality (optional): ")
-            birth_year = input("Author birth year (optional): ")
-            isbn = input("ISBN: ")
-            category = input("Category (optional): ")
-            year = input("Publication year (optional): ")
-
-            # Convert year and birth_year to int if provided
-            birth_year = int(birth_year) if birth_year else None
-            year = int(year) if year else None
-
+            nationality = input("Nationality (optional): ") or None
+            birth_year = input("Birth year (optional): ") or None
             author = Author(author_name, nationality, birth_year)
-            book = Book(title, author, isbn, category, year)
-
+            isbn = input("ISBN: ")
+            year = input("Publication year: ")
+            category = input("Category (optional): ") or "General"
+            copies = int(input("Number of copies: "))
+            book = Book(title, author, isbn, year, category, copies)
             books.append(book)
             file_io.save_books(books)
-            print(f"Book '{title}' added!\n")
+            print("Book added successfully.")
 
         elif choice == "2":
-            # List all books
-            if not books:
-                print("No books in the library.\n")
-            else:
-                print("Books in library:")
-                for b in books:
-                    print(b)
-                print()
+            print("Books in library:")
+            for b in books:
+                available = get_available_copies(b, borrows)
+                print(f"{b} | Available copies: {available}")
 
         elif choice == "3":
-            # Borrow a book
-            borrower = input("Borrower name: ")
             isbn = input("ISBN of book to borrow: ")
-
-            # Find the book
             book_to_borrow = next((b for b in books if b.isbn == isbn), None)
             if not book_to_borrow:
-                print("Book not found.\n")
+                print("Book not found.")
+            elif get_available_copies(book_to_borrow, borrows) <= 0:
+                print("No available copies to borrow.")
             else:
+                borrower = input("Your name: ")
                 borrow_record = Borrow(borrower, book_to_borrow.title)
                 borrows.append(borrow_record)
                 file_io.save_borrows(borrows)
-                print(f"{borrower} borrowed '{book_to_borrow.title}'.\n")
+                print(f"Book borrowed successfully! Due date: {borrow_record.due_date}")
 
         elif choice == "4":
-            # List borrow records
-            if not borrows:
-                print("No borrow records.\n")
+            borrower = input("Your name: ")
+            isbn = input("ISBN of book to return: ")
+            book_to_return = next((b for b in books if b.isbn == isbn), None)
+            borrow_record = next(
+                (b for b in borrows if b.borrower_name == borrower and 
+                 b.book_title == book_to_return.title and b.return_date is None),
+                None
+            )
+            if borrow_record:
+                borrow_record.mark_returned()
+                file_io.save_borrows(borrows)
+                print("Book returned successfully.")
             else:
-                print("Borrow Records:")
-                for r in borrows:
-                    print(r)
-                print()
+                print("No active borrow record found for this book and borrower.")
 
         elif choice == "5":
+            print("Borrow records:")
+            for b in borrows:
+                status = "Returned" if b.return_date else ("Overdue" if b.is_overdue() else "Borrowed")
+                print(f"{b} | Status: {status}")
+
+        elif choice == "6":
+            file_io.save_books(books)
+            file_io.save_borrows(borrows)
             print("Exiting...")
             break
         else:
-            print("Invalid choice. Try again.\n")
-
+            print("Invalid choice. Try again.")
 
 if __name__ == "__main__":
     main()

@@ -3,6 +3,8 @@ from pathlib import Path
 from .resources import Book
 from .author import Author
 from .borrow import Borrow
+from datetime import date,timedelta
+
 
 DATA_FOLDER = Path("data")
 DATA_FOLDER.mkdir(exist_ok=True)
@@ -27,6 +29,7 @@ def serialize_book(book):
         "isbn": book.isbn,
         "category": book.category,
         "year": book.year,
+        "copies": book.copies,
         "author": {
             "name": book.author.title,
             "nationality": getattr(book.author, "nationality", None),
@@ -43,7 +46,8 @@ def deserialize_book(data):
         author=author,
         isbn=data["isbn"],
         category=data.get("category"),
-        year=data.get("year")
+        year=data.get("year"),
+        copies=data.get("copies",1)
     )
     
 def save_borrows(borrows):
@@ -62,17 +66,21 @@ def serialize_borrow(borrow):
         "borrower_name": borrow.borrower_name,
         "book_title": borrow.book_title,
         "borrow_date": str(borrow.borrow_date),
-        "return_date": str(borrow.return_date) if borrow.return_date else None
+        "return_date": str(borrow.return_date) if borrow.return_date else None,
+        "due_date": str(borrow.due_date)
 
     }
     
 def deserialize_borrow(data):
    from datetime import date
-   borrow_date = date.fromisoformat(data["borrow_date"])
-   return_date = date.fromisoformat(data["return_date"]) if data.get("return_date") else None
+   borrow_date = date.fromisoformat(data["borrow_date"]) if data.get("borrow_date") and data["borrow_date"] != "None" else date.today()
+   due_date = date.fromisoformat(data["due_date"]) if data.get("due_date") and data["due_date"] != "None" else (borrow_date + timedelta(days=14))
+   return_date = date.fromisoformat(data["return_date"]) if data.get("return_date") and data["return_date"] != "None" else None
+
    return Borrow(
         borrower_name=data["borrower_name"],
         book_title=data["book_title"],
         borrow_date=borrow_date,
+        due_date=due_date,
         return_date=return_date
     )

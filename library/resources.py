@@ -22,11 +22,11 @@ class Book(LibraryResource):
         self.isbn = isbn
         self.year = year
         self.category = category
-        self.total_copies = copies
+        self.copies = copies
         
         
     def __repr__(self):
-        return (f"Book(title={self.title}, author={self.author}, isbn={self.isbn}, year={self.year}, category={self.category}, available={self.available})")
+        return (f"Book(title={self.title}, author={self.author}, isbn={self.isbn}, year={self.year}, category={self.category}")
     
     def __eq__(self, other):
         if not isinstance(other, Book):

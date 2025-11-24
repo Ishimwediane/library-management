@@ -2,7 +2,15 @@
     {
         "borrower_name": "jhkf",
         "book_title": "jhkf",
-        "borrow_date": "None",
-        "return_date": null
+        "borrow_date": "2025-11-24",
+        "return_date": null,
+        "due_date": "2025-12-08"
+    },
+    {
+        "borrower_name": "ddd",
+        "book_title": "hhh",
+        "borrow_date": "2025-11-24",
+        "return_date": "2025-11-24",
+        "due_date": "2025-12-08"
     }
 ]
