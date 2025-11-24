@@ -10,17 +10,5 @@
             "nationality": "wee",
             "birth_year": 234
         }
-    },
-    {
-        "title": "hhh",
-        "isbn": "234",
-        "category": "hhh",
-        "year": "234",
-        "copies": 2,
-        "author": {
-            "name": "hhh",
-            "nationality": "hhh",
-            "birth_year": "234"
-        }
     }
 ]

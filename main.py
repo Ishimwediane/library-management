@@ -3,6 +3,9 @@ from library.author import Author
 from library.borrow import Borrow
 from library import file_io
 from datetime import date
+from library.utils import search_books,filter_books,get_available_copies
+
+
 
 def get_available_copies(book, borrows):
     borrowed_count = sum(1 for b in borrows if b.book_title == book.title and b.return_date is None)
@@ -19,7 +22,10 @@ def main():
         print("3. Borrow a book")
         print("4. Return a book")
         print("5. List borrow records")
-        print("6. Exit")
+        print("6. search a book")
+        print("7. filter records")
+        print("8. Delete a book")
+        print("9. Exit")
         choice = input("Enter your choice: ")
 
         if choice == "1":
@@ -78,8 +84,44 @@ def main():
             for b in borrows:
                 status = "Returned" if b.return_date else ("Overdue" if b.is_overdue() else "Borrowed")
                 print(f"{b} | Status: {status}")
-
+                
         elif choice == "6":
+            field = input("Search by (title/author/isbn/category/year): ").lower()
+            query = input("Enter search query: ")
+            results = search_books(books, query, field)
+            for b in results:
+             print(b)
+
+        elif choice == "7":
+            criteria = input("Filter by (available/borrowed/category): ").lower()
+            category = None
+            if criteria == "category":
+                category = input("Enter category: ")
+            results = filter_books(books, borrows, criteria, category)
+            if results:
+                print("Filter results:")
+                for b in results:
+                    available = get_available_copies(b, borrows)
+                    print(f"{b} | Available copies: {available}")
+            else:
+                print("No books match the filter criteria.")
+        
+        elif choice == "8":
+              isbn = input("Enter ISBN of the book to delete: ")
+              book = next((b for b in books if b.isbn == isbn), None)
+              if not book:
+                print("Book not found.")
+                continue
+              active_borrows = [b for b in borrows if b.book_title == book.title and not b.return_date]
+              if active_borrows:
+                 print("Cannot delete. Some copies are currently borrowed.")
+                 continue
+              books.remove(book)
+              file_io.save_books(books)
+              print(f"Book {book.title} deleted successfully.")
+      
+                
+        elif choice == "9":
             file_io.save_books(books)
             file_io.save_borrows(borrows)
             print("Exiting...")

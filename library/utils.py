@@ -1,3 +1,7 @@
+def get_available_copies(book, borrows):
+    borrowed_count = sum(1 for b in borrows if b.book_title == book.title and not b.return_date)
+    return book.copies - borrowed_count
+
 def search_books(books, query, field):
     query = query.lower()
     results = []
