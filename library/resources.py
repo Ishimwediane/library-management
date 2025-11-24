@@ -1,7 +1,11 @@
 from abc import ABC, abstractmethod
 
 class LibraryResource(ABC):
+    def __init__(self,title):
+        self.title = title
+    
     """abstract class for library resources"""
+    
     @abstractmethod
     def __repr__(self):
         pass
@@ -12,13 +16,14 @@ class LibraryResource(ABC):
    
 class Book(LibraryResource):
     """class for books"""
-    def __init__(self, title, author,isbn,year,category :str="General"):
+    def __init__(self, title, author,isbn,year,category :str="General",copies=1):
         self.title = title
         self.author = author
         self.isbn = isbn
         self.year = year
         self.category = category
-        self.available=False
+        self.total_copies = copies
+        
         
     def __repr__(self):
         return (f"Book(title={self.title}, author={self.author}, isbn={self.isbn}, year={self.year}, category={self.category}, available={self.available})")

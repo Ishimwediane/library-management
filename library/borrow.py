@@ -5,6 +5,7 @@ class Borrow(LibraryResource):
     def __init__(self,borrower_name,book_title,borrow_date=None,return_date=None):
         
         super().__init__(borrower_name)
+        self.borrower_name = borrower_name
         self.book_title = book_title
         self.borrow_date = borrow_date
         self.return_date = return_date

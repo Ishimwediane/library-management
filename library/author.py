@@ -7,6 +7,7 @@ class Author(LibraryResource):
         super().__init__(name)
         self.nationality = nationality
         self.birth_year = birth_year
+        self.name = name
     
     def __repr__(self):
         return (f"Author(name={self.name}, nationality={self.nationality}, birth_year={self.birth_year})")
