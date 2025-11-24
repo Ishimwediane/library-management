@@ -3,7 +3,8 @@ from library.author import Author
 from library.borrow import Borrow
 from library import file_io
 from datetime import date
-from library.utils import search_books,filter_books,get_available_copies
+from library.utils import search_books,filter_books,get_available_copies,get_borrowed_count
+
 
 
 
@@ -47,22 +48,25 @@ def main():
             print("Books in library:")
             for b in books:
                 available = get_available_copies(b, borrows)
-                print(f"{b} | Available copies: {available}")
-
+                borrowed = get_borrowed_count(b, borrows)
+                print(f"{b} | Available: {available} | Borrowed: {borrowed}")
+        
         elif choice == "3":
             isbn = input("ISBN of book to borrow: ")
             book_to_borrow = next((b for b in books if b.isbn == isbn), None)
             if not book_to_borrow:
                 print("Book not found.")
-            elif get_available_copies(book_to_borrow, borrows) <= 0:
-                print("No available copies to borrow.")
             else:
-                borrower = input("Your name: ")
-                borrow_record = Borrow(borrower, book_to_borrow.title)
-                borrows.append(borrow_record)
-                file_io.save_borrows(borrows)
-                print(f"Book borrowed successfully! Due date: {borrow_record.due_date}")
-
+                available = get_available_copies(book_to_borrow, borrows)
+                if available <= 0:
+                    print("No available copies to borrow.")
+                else:
+                    borrower = input("Your name: ")
+                    borrow_record = Borrow(borrower, book_to_borrow.title)
+                    borrows.append(borrow_record)
+                    file_io.save_borrows(borrows)
+                    print(f"Book borrowed successfully! Due date: {borrow_record.due_date}")
+        
         elif choice == "4":
             borrower = input("Your name: ")
             isbn = input("ISBN of book to return: ")
@@ -91,7 +95,7 @@ def main():
             results = search_books(books, query, field)
             for b in results:
              print(b)
-
+        
         elif choice == "7":
             criteria = input("Filter by (available/borrowed/category): ").lower()
             category = None
@@ -102,7 +106,8 @@ def main():
                 print("Filter results:")
                 for b in results:
                     available = get_available_copies(b, borrows)
-                    print(f"{b} | Available copies: {available}")
+                    borrowed = get_borrowed_count(b, borrows)
+                    print(f"{b} | Available: {available} | Borrowed: {borrowed}")
             else:
                 print("No books match the filter criteria.")
         

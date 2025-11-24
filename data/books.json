@@ -10,5 +10,17 @@
             "nationality": "wee",
             "birth_year": 234
         }
+    },
+    {
+        "title": "action",
+        "isbn": "2003",
+        "category": "action",
+        "year": "2013",
+        "copies": 30,
+        "author": {
+            "name": "Diane",
+            "nationality": "rwandan",
+            "birth_year": "2003"
+        }
     }
 ]
