@@ -34,9 +34,6 @@ def search_books(books: list[Book], query: str, field: str) -> list[Book]:
 def filter_books(books: list[Book], borrows: list[Borrow], criteria: str, category: str = None) -> list[Book]:
     """
     Filter books based on criteria:
-    available: any book with at least one copy available
-    borrowed: any book with at least one copy borrowed
-    category: books matching category
     """
     filtered = []
     for book in books:
