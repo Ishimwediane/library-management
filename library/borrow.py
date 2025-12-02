@@ -11,6 +11,7 @@ class Borrow(LibraryResource):
         self.borrow_date = borrow_date or date.today()
         self.due_date = due_date or self.borrow_date + timedelta(days=14)
         self.return_date = return_date
+        
     def is_overdue(self):
         return self.return_date is None and date.today() > self.due_date
         
