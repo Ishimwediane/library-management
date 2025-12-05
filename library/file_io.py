@@ -4,6 +4,7 @@ from .resources import Book
 from .author import Author
 from .borrow import Borrow
 from datetime import date,timedelta
+from .enum import Categories, TypeOfBook
 
 
 DATA_FOLDER = Path("data")
@@ -27,11 +28,12 @@ def serialize_book(book):
     return {
         "title": book.title,
         "isbn": book.isbn,
-        "category": book.category,
+        "category": book.category.value,
+        "book_type": book.book_type.value,
         "year": book.year,
         "copies": book.copies,
         "author": {
-            "name": book.author.title,
+            "name": book.author.name,
             "nationality": getattr(book.author, "nationality", None),
             "birth_year": getattr(book.author, "birth_year", None)
         }
@@ -45,7 +47,8 @@ def deserialize_book(data):
         title=data["title"],
         author=author,
         isbn=data["isbn"],
-        category=data.get("category"),
+        category=Categories(data.get("category","General")),
+        book_type=TypeOfBook(data.get("book_type","Hardcover")),
         year=data.get("year"),
         copies=data.get("copies",1)
     )
@@ -83,4 +86,30 @@ def deserialize_borrow(data):
         borrow_date=borrow_date,
         due_date=due_date,
         return_date=return_date
+    )
+   
+def save_authors(authors):
+    """Save authors list to authors.json"""
+    with open(AUTHORS_FILE, "w", encoding="utf-8") as f:
+        json.dump([serialize_author(a) for a in authors], f, indent=4)
+
+def load_authors():
+    """Load authors list from authors.json"""
+    if not AUTHORS_FILE.exists() or AUTHORS_FILE.stat().st_size == 0:
+        return []
+    with open(AUTHORS_FILE, "r", encoding="utf-8") as f:
+        return [deserialize_author(a) for a in json.load(f)]
+
+def serialize_author(author):
+    return {
+        "name": author.name,
+        "nationality": getattr(author, "nationality", None),
+        "birth_year": getattr(author, "birth_year", None)
+    }
+
+def deserialize_author(data):
+    return Author(
+        name=data["name"],
+        nationality=data.get("nationality"),
+        birth_year=data.get("birth_year")
     )

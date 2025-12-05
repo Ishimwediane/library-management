@@ -31,19 +31,26 @@ def search_books(books: list[Book], query: str, field: str) -> list[Book]:
             results.append(book)
     return results
 
-def filter_books(books: list[Book], borrows: list[Borrow], criteria: str, category: str = None) -> list[Book]:
+def filter_books(books: list[Book], borrows: list[Borrow], criteria: str, value=None) -> list[Book]:
     """
     Filter books based on criteria:
+    - available: books with copies available
+    - borrowed: books currently borrowed
+    - category: books matching a specific category (value should be a Categories enum)
+    - type: books matching a specific type (value should be a TypeOfBook enum)
     """
     filtered = []
     for book in books:
-        available = get_available_copies(book, borrows)
-        borrowed = get_borrowed_count(book, borrows)
-        
-        if criteria == "available" and available > 0:
+        available_count = get_available_copies(book, borrows)
+        borrowed_count = get_borrowed_count(book, borrows)
+
+        if criteria == "available" and available_count > 0:
             filtered.append(book)
-        elif criteria == "borrowed" and borrowed > 0:
+        elif criteria == "borrowed" and borrowed_count > 0:
             filtered.append(book)
-        elif criteria == "category" and category and book.category.lower() == category.lower():
+        elif criteria == "category" and isinstance(value, Categories) and book.category == value:
             filtered.append(book)
+        elif criteria == "type" and isinstance(value, TypeOfBook) and book.book_type == value:
+            filtered.append(book)
+
     return filtered
